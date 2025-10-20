@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TO DO LIST</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap');
+
+        :root {
+            --primary-color: rgb(17, 86, 102);
+            --primary-color-darker: rgb(9, 48, 56);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        *::selection {
+            background-color: lightblue;
+        }
+
+        h1,
+        h4 {
+            text-align: center;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #4f3ffc;
+            background: linear-gradient(148deg, rgba(79, 63, 252, 1) 0%, rgba(87, 147, 199, 1) 50%, rgba(147, 83, 237, 1) 100%);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            font-size: 1.3em;
+            line-height: 1.5em;
+
+        }
+
+        .container {
+            width: 60vw;
+            margin: 50px auto;
+            padding: 20px;
+
+            background: #fff;
+            border-radius: 10px;
+            border: 3px solid rgb(98, 0, 255);
+        }
+
+        .addTask {
+            text-align: center;
+            position: relative;
+            user-select: none;
+        }
+
+
+        .addTaskButton {
+            background-color: lightblue;
+            border-radius: 15px;
+            position: relative;
+            margin-left: -45px;
+            border-color: rgb(0, 174, 255);
+            cursor: pointer;
+            height: 50px;
+        }
+
+        ul {
+            display: flex;
+        }
+
+        .taskLocal {
+            margin-top: 15px;
+            display: grid;
+            place-content: center;
+        }
+
+        .removeTaskButton {
+            background-color: transparent;
+            border: none;
+            color: red;
+            font-size: 30px;
+            margin-left: 30px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        #taskWarning {
+            text-align: center;
+            color: red;
+            user-select: none;
+        }
+
+        .generateDiv {
+            background-color: rgb(0, 179, 255);
+            width: 55vw;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        input {
+            border-radius: 20px;
+            border-color: rgb(0, 174, 255);
+            margin-bottom: 10px;
+            width: 300px;
+            height: 50px;
+        }
+
+        label {
+            position: absolute;
+            margin-left: -290px;
+            transform: translateY(10px);
+            color: #848484;
+            transition: 1s;
+        }
+
+        input:valid+label,
+        input:focus+label {
+            position: absolute;
+            transform: translateY(-15px);
+            padding: 0px 5px 0px;
+            background-color: white;
+            transition: 1s;
+        }
+
+        ::-webkit-scrollbar {
+            background-color: rgb(179, 0, 255);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: white;
+            border-radius: 15px;
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+
+            -webkit-box-shadow: 0 0 0 1000px white inset !important;
+            -webkit-text-fill-color: black !important;
+        }
+
+        title {
+            border-radius: 10px;
+        }
+
+        /* ======================================== MEDIA QUERY =========================================== */
+
+        @media (max-width: 480px) {
+            .container {
+                width: 80vw;
+            }
+
+            .generateDiv {
+                width: 50vw;
+            }
+
+            input {
+                width: 160px;
+            }
+
+            label {
+                margin-left: -150px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="info">
+            <h1>TO DO LIST</h1>
+            <h4>Coloque no campo abaixo suas tarefas para fazer:</h4>
+            <p id="taskWarning"></p>
+        </div>
+
+        <div class="addTask">
+            <input required type="text" name="addTaskInput" id="addTaskInput">
+            <label for="addTaskInput">Tarefa</label>
+            <button title="Adicionar Tarefa" class="addTaskButton">ADICIONAR</button>
+
+        </div>
+
+        <div class="taskLocal">
+        </div>
+    </div>
+
+    <script>
+
+        function embedGlobalScopeToDoList() {
+
+            const taskLocal = document.querySelector('.taskLocal')
+            const addTaskButton = document.querySelector('.addTaskButton')
+            let taskCount = 0
+
+            function activateFunctions() {
+                const taskWarning = document.querySelector("#taskWarning")
+                console.log(addTaskInput)
+
+                addTaskButton.addEventListener('click', (e) => {
+                    const addTaskInput = document.querySelector('#addTaskInput').value;
+                    if (!addTaskInput) {
+                        taskWarning.innerText = "Campo não pode ser vazio!"
+                        return
+                    }
+                    createTask(addTaskInput)
+                })
+                document.addEventListener('keydown', (e) => {
+                    const addTaskInput = document.querySelector('#addTaskInput').value;
+                    // e.keyCode === 13
+                    if (e.key === 'Enter') {
+                        if (!addTaskInput) {
+                            taskWarning.innerText = "Campo não pode ser vazio!"
+                            return
+                        }
+                        createTask(addTaskInput)
+                    }
+                })
+            }
+            activateFunctions()
+
+            function createTask(task) {
+
+                const clearInput = document.querySelector('#addTaskInput')
+
+                clearInput.value = "";
+
+                taskWarning.innerText = '';
+                taskCount++
+
+                const generateULtask = document.createElement('ul');
+                const generateRemoveTaskButton = document.createElement('button');
+                const generateEditTaskButton = document.createElement('button');
+                const generateLItask = document.createElement('li');
+                const generateDIVtask = document.createElement('div');
+
+                generateRemoveTaskButton.setAttribute('class', "removeTaskButton");
+                generateRemoveTaskButton.setAttribute('title', "Apagar Tarefa");
+
+                generateULtask.appendChild(generateLItask);
+                generateULtask.appendChild(generateRemoveTaskButton);
+
+                generateLItask.innerText = task;
+                generateRemoveTaskButton.innerText = "X";
+
+                generateDIVtask.classList.add(`task${taskCount}`);
+                generateDIVtask.appendChild(generateULtask);
+
+                generateDIVtask.classList.add('central');
+                generateDIVtask.classList.add('generateDiv');
+
+                taskLocal.appendChild(generateDIVtask);
+
+                saveTask()
+            }
+
+            function removeTaskButton() {
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('removeTaskButton')) {
+                        const el = e.target.parentElement;
+                        const elel = el.parentElement.remove();
+                        saveTask()
+                    }
+                })
+            }
+            removeTaskButton()
+
+            function saveTask() {
+                const getAllTasks = taskLocal.querySelectorAll('li');
+                const taskList = [];
+
+                for (let task of getAllTasks) {
+                    let taskText = task.innerText;
+                    taskText = taskText.replace('X', '');
+
+                    taskList.push(taskText);
+
+                }
+                const saveTaskInJSONformat = JSON.stringify(taskList)
+                localStorage.setItem('taskSaved', saveTaskInJSONformat)
+            }
+
+            function loadSavedTasksInJSON() {
+                const getSavedTasksInJSONformat = localStorage.getItem('taskSaved')
+                const convertTaskListToArray = JSON.parse(getSavedTasksInJSONformat)
+
+                for (let task of convertTaskListToArray) {
+                    createTask(task)
+                }
+
+            }
+            loadSavedTasksInJSON()
+        }
+        embedGlobalScopeToDoList()
+
+    </script>
+</body>
+
+</html>
