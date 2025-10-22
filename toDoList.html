@@ -15,19 +15,6 @@
             --primary-color-darker: rgb(9, 48, 56);
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        *::selection {
-            background-color: lightblue;
-        }
-
-        h1,
-        h4 {
-            text-align: center;
-        }
-
         body {
             margin: 0;
             padding: 0;
@@ -43,6 +30,19 @@
 
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        *::selection {
+            background-color: lightblue;
+        }
+
+        h1,
+        h4 {
+            text-align: center;
+        }
+
         .container {
             width: 60vw;
             margin: 50px auto;
@@ -51,6 +51,23 @@
             background: #fff;
             border-radius: 10px;
             border: 3px solid rgb(98, 0, 255);
+
+            word-break: break-word;
+        }
+
+        #taskWarning {
+            text-align: center;
+            color: red;
+            user-select: none;
+        }
+
+        .generateDiv {
+            display: flex;
+            position: relative;
+            background-color: rgb(0, 179, 255);
+            width: 55vw;
+            margin-bottom: 20px;
+            border-radius: 10px;
         }
 
         .addTask {
@@ -59,19 +76,14 @@
             user-select: none;
         }
 
-
         .addTaskButton {
             background-color: lightblue;
             border-radius: 15px;
+            border-color: rgb(0, 174, 255);
             position: relative;
             margin-left: -45px;
-            border-color: rgb(0, 174, 255);
             cursor: pointer;
             height: 50px;
-        }
-
-        ul {
-            display: flex;
         }
 
         .taskLocal {
@@ -90,17 +102,43 @@
             user-select: none;
         }
 
-        #taskWarning {
-            text-align: center;
-            color: red;
+        .editTaskButton {
+            background-color: transparent;
+            color: rgb(255, 255, 255);
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
             user-select: none;
+            z-index: 8;
         }
 
-        .generateDiv {
-            background-color: rgb(0, 179, 255);
-            width: 55vw;
-            margin-bottom: 20px;
-            border-radius: 10px;
+        .alterTaskButton {
+            background-color: lightblue;
+            border-radius: 15px;
+            border-color: rgb(0, 174, 255);
+
+            width: 70px;
+            height: 50px;
+
+            margin-top: 90px;
+            margin-left: 100px;
+            z-index: 9;
+        }
+
+        #alterTask {
+            margin-top: 90px;
+            margin-left: -300px;
+        }
+
+        .triangle {
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            width: 20px;
+            height: 20px;
+            background-color: black;
+
+            margin-top: 70px;
+            margin-left: -120px;
+            z-index: 9;
         }
 
         input {
@@ -109,6 +147,7 @@
             margin-bottom: 10px;
             width: 300px;
             height: 50px;
+
         }
 
         label {
@@ -128,15 +167,6 @@
             transition: 1s;
         }
 
-        ::-webkit-scrollbar {
-            background-color: rgb(179, 0, 255);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background-color: white;
-            border-radius: 15px;
-        }
-
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
@@ -146,8 +176,13 @@
             -webkit-text-fill-color: black !important;
         }
 
-        title {
-            border-radius: 10px;
+        ::-webkit-scrollbar {
+            background-color: rgb(179, 0, 255);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: white;
+            border-radius: 15px;
         }
 
         /* ======================================== MEDIA QUERY =========================================== */
@@ -185,92 +220,171 @@
             <input required type="text" name="addTaskInput" id="addTaskInput">
             <label for="addTaskInput">Tarefa</label>
             <button title="Adicionar Tarefa" class="addTaskButton">ADICIONAR</button>
-
         </div>
 
-        <div class="taskLocal">
-        </div>
+        <div class="taskLocal"></div>
     </div>
-
     <script>
-
         function embedGlobalScopeToDoList() {
 
-            const taskLocal = document.querySelector('.taskLocal')
-            const addTaskButton = document.querySelector('.addTaskButton')
-            let taskCount = 0
+            const taskLocal = document.querySelector('.taskLocal');
+            const addTaskButton = document.querySelector('.addTaskButton');
+            const taskWarning = document.querySelector("#taskWarning");
+            let taskCount = 0;
 
-            function activateFunctions() {
-                const taskWarning = document.querySelector("#taskWarning")
-                console.log(addTaskInput)
-
+            function eventListenerActivateFunctions() {
                 addTaskButton.addEventListener('click', (e) => {
                     const addTaskInput = document.querySelector('#addTaskInput').value;
                     if (!addTaskInput) {
-                        taskWarning.innerText = "Campo não pode ser vazio!"
-                        return
+                        taskWarning.innerText = "Campo não pode ser vazio!";
+                        return;
                     }
-                    createTask(addTaskInput)
+                    createTask(addTaskInput);
                 })
-                document.addEventListener('keydown', (e) => {
+                document.addEventListener('keypress', (e) => {
                     const addTaskInput = document.querySelector('#addTaskInput').value;
+
                     // e.keyCode === 13
                     if (e.key === 'Enter') {
                         if (!addTaskInput) {
-                            taskWarning.innerText = "Campo não pode ser vazio!"
-                            return
+                            taskWarning.innerText = "Campo não pode ser vazio!";
+                            return;
                         }
-                        createTask(addTaskInput)
+                        createTask(addTaskInput);
                     }
                 })
             }
-            activateFunctions()
+            eventListenerActivateFunctions();
 
             function createTask(task) {
 
-                const clearInput = document.querySelector('#addTaskInput')
-
+                const clearInput = document.querySelector('#addTaskInput');
                 clearInput.value = "";
 
                 taskWarning.innerText = '';
                 taskCount++
 
                 const generateULtask = document.createElement('ul');
-                const generateRemoveTaskButton = document.createElement('button');
-                const generateEditTaskButton = document.createElement('button');
                 const generateLItask = document.createElement('li');
+
+                const generateEditTaskButton = document.createElement('button');
+                const generateRemoveTaskButton = document.createElement('button');
+
                 const generateDIVtask = document.createElement('div');
+
+                generateEditTaskButton.setAttribute('class', 'editTaskButton');
+                generateEditTaskButton.setAttribute('title', 'Editar Tarefa');
 
                 generateRemoveTaskButton.setAttribute('class', "removeTaskButton");
                 generateRemoveTaskButton.setAttribute('title', "Apagar Tarefa");
 
-                generateULtask.appendChild(generateLItask);
-                generateULtask.appendChild(generateRemoveTaskButton);
-
+                generateDIVtask.setAttribute('class', 'generateDiv');
+                generateDIVtask.classList.add(`task${taskCount}`);
+                
                 generateLItask.innerText = task;
                 generateRemoveTaskButton.innerText = "X";
+                generateEditTaskButton.innerText = "Editar";
 
-                generateDIVtask.classList.add(`task${taskCount}`);
+                generateULtask.appendChild(generateLItask);
+                generateULtask.appendChild(generateEditTaskButton);
+                generateULtask.appendChild(generateRemoveTaskButton);
+
                 generateDIVtask.appendChild(generateULtask);
-
-                generateDIVtask.classList.add('central');
-                generateDIVtask.classList.add('generateDiv');
 
                 taskLocal.appendChild(generateDIVtask);
 
-                saveTask()
+                saveTask();
             }
 
-            function removeTaskButton() {
+            function createEditTaskButton() {
                 document.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('removeTaskButton')) {
-                        const el = e.target.parentElement;
-                        const elel = el.parentElement.remove();
-                        saveTask()
+                    if (e.target.classList.contains('editTaskButton')) {
+
+                        const getFirstElement = e.target.parentElement;
+                        const getSecondElement = getFirstElement.parentElement;
+
+                        const getEditTaskButton = document.querySelector('.editTaskButton');
+                        getEditTaskButton.disabled = true;
+
+                        const generateDIVtriangle = document.createElement('div');
+                        const generateAlterTaskButton = document.createElement('button');
+                        const generateInputEditTask = document.createElement('Input');
+
+                        generateDIVtriangle.setAttribute('class', 'triangle')
+
+                        generateInputEditTask.setAttribute('id', 'alterTask')
+                        generateInputEditTask.setAttribute('class', 'edit')
+
+                        generateAlterTaskButton.setAttribute('class', 'alterTaskButton')
+                        generateAlterTaskButton.innerText = "Salvar"
+
+                        getSecondElement.appendChild(generateDIVtriangle);
+                        getSecondElement.appendChild(generateAlterTaskButton);
+                        getSecondElement.appendChild(generateInputEditTask);
+
+                        editTask();
+                        verifyBlurOfEditTaskInput();
                     }
                 })
             }
-            removeTaskButton()
+            createEditTaskButton()
+
+            function editTask() {
+                const getAlterTaskInput = document.querySelector('#alterTask').value;
+                const getAlterTaskButton = document.querySelector('.alterTaskButton').addEventListener('click', (e) => {
+                    if (!getAlterTaskInput) {
+                        taskWarning.innerText = "Campo não pode ser vazio!";
+                        return;
+                    }
+                    createTask(getAlterTaskInput);
+
+                    const getFirstElement = e.target.parentElement.remove();
+                    saveTask();
+                })
+                document.addEventListener('keypress', (e) => {
+                    if (e.key === "Enter") {
+                        if (!getAlterTaskInput) {
+                            taskWarning.innerText = "Campo não pode ser vazio!";
+                            return;
+                        }
+                        createTask(getAlterTaskInput);
+
+                        const getFirstElement = e.target.parentElement.remove();
+                        saveTask();
+                    }
+                })
+            }
+
+            function verifyBlurOfEditTaskInput() {
+                document.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('editTaskButton') && !e.target.classList.contains('edit')) {
+                        try {
+                            const getTriangle = document.querySelector('.triangle');
+                            const getAlterTaskInput = document.querySelector('#alterTask');
+                            const getAlterTaskButton = document.querySelector('.alterTaskButton');
+
+                            const getEditTaskButton = document.querySelector('.editTaskButton');
+                            getEditTaskButton.disabled = false;
+
+                            getTriangle.remove();
+                            getAlterTaskInput.remove();
+                            getAlterTaskButton.remove();
+                        } catch (e) {}
+                    }
+
+                })
+            }
+
+            function removeTask() {
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('removeTaskButton')) {
+                        const getFirstElement = e.target.parentElement;
+                        const getSecondElement = getFirstElement.parentElement.remove();
+                        saveTask();
+                    }
+                })
+            }
+            removeTask()
 
             function saveTask() {
                 const getAllTasks = taskLocal.querySelectorAll('li');
@@ -278,28 +392,26 @@
 
                 for (let task of getAllTasks) {
                     let taskText = task.innerText;
-                    taskText = taskText.replace('X', '');
+                    taskText = taskText.replace(',', '');
 
                     taskList.push(taskText);
-
                 }
-                const saveTaskInJSONformat = JSON.stringify(taskList)
-                localStorage.setItem('taskSaved', saveTaskInJSONformat)
+                const saveTaskInJSONformat = JSON.stringify(taskList);
+                localStorage.setItem('taskSaved', saveTaskInJSONformat);
             }
 
             function loadSavedTasksInJSON() {
-                const getSavedTasksInJSONformat = localStorage.getItem('taskSaved')
-                const convertTaskListToArray = JSON.parse(getSavedTasksInJSONformat)
+                const getSavedTasksInJSONformat = localStorage.getItem('taskSaved');
+                const convertTaskListToArray = JSON.parse(getSavedTasksInJSONformat);
 
                 for (let task of convertTaskListToArray) {
-                    createTask(task)
+                    createTask(task);
                 }
 
             }
-            loadSavedTasksInJSON()
+            loadSavedTasksInJSON();
         }
-        embedGlobalScopeToDoList()
-
+        embedGlobalScopeToDoList();
     </script>
 </body>
 
